@@ -1,0 +1,38 @@
+---
+
+- name: lancement des mises a jour
+  yum:  name=* state=latest
+
+- name: Install packages
+  yum: name={{ item }} state=latest
+  with_items:
+   - libselinux-python 
+   - epel-release
+   - python34
+   - git
+   - python-pip
+
+- name: reload ansible facts
+  setup: 
+
+- name:  verification commande pip
+  command: python -m pip install -U pip
+
+- name:  creation directorie de travail 
+  file: path=/home/dev/ state=directory
+
+- name: copy python librairies configuration files 
+  copy: src=requirements.txt  dest=/home/dev/requirements.txt
+
+- name:  installation des librairies flask
+  shell: pip install -r /home/dev/requirements.txt
+
+- name: copy files  
+  copy: src=hello.py  dest=/home/dev/hello.py
+
+- name: copy directory
+  copy: src={{ item }} dest=/home/dev/
+  with_fileglob:
+    - static/*
+    - templates/* 
+

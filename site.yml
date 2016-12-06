@@ -1,0 +1,7 @@
+---
+- name: Install  Python-Web Flask
+  hosts: all
+  remote_user: root
+
+  roles:
+    - flask
