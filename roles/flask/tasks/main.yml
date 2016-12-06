@@ -1,22 +1,26 @@
 ---
-
 - name: lancement des mises a jour
   yum:  name=* state=latest
+
+- name: install epel-release
+  yum:  name=epel-release state=present
 
 - name: Install packages
   yum: name={{ item }} state=latest
   with_items:
    - libselinux-python 
-   - epel-release
+   - python34-setuptools
    - python34
    - git
-   - python-pip
 
 - name: reload ansible facts
   setup: 
 
-- name:  verification commande pip
-  command: python -m pip install -U pip
+- name:  Get pip3
+  shell: wget https //bootstrap.pypa.io/get-pip.py
+
+- name:  Install pip3
+  shell: python3 get-pip.py
 
 - name:  creation directorie de travail 
   file: path=/home/dev/ state=directory
@@ -25,14 +29,24 @@
   copy: src=requirements.txt  dest=/home/dev/requirements.txt
 
 - name:  installation des librairies flask
-  shell: pip install -r /home/dev/requirements.txt
+  shell:  pip3 install -r /home/dev/requirements.txt
 
-- name: copy files  
+- name:  creation directorie static de travail
+  file: path=/home/dev/static state=directory
+
+- name:  creation directorie templates de travail
+  file: path=/home/dev/templates state=directory
+
+- name: copy main file  
   copy: src=hello.py  dest=/home/dev/hello.py
 
 - name: copy directory
-  copy: src={{ item }} dest=/home/dev/
+  copy: src={{ item }} dest=/home/dev/static 
   with_fileglob:
     - static/*
-    - templates/* 
+
+- name: copy directory
+  copy: src={{ item }} dest=/home/dev/templates 
+  with_fileglob:
+    - templates/*
 
